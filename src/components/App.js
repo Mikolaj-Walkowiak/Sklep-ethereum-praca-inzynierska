@@ -58,6 +58,7 @@ class App extends Component {
       loading: true
     }
     this.CreateProduct = this.CreateProduct.bind(this)
+    this.CreateProductImage = this.CreateProductImage.bind(this)
     this.BuyProduct = this.BuyProduct.bind(this)
   }
 
@@ -68,6 +69,15 @@ class App extends Component {
       this.setState({loading: false})
     })
   }
+  
+  CreateProductImage(name,description,hash, price){
+    this.setState({loading: true})
+    this.state.marketplace.methods.CreateProductImage(name,description,hash,price)
+    .send({from: this.state.account}).once('receipt', (receipt)=>{
+      this.setState({loading: false})
+    })
+  }
+  
   BuyProduct(id,price){
     this.setState({loading: true})
     this.state.marketplace.methods.BuyProduct(id)
@@ -87,6 +97,7 @@ class App extends Component {
               <div id="loader" className="text-center"><p className="text-center">Loading...</p></div> 
               : <Main 
                     CreateProduct={this.CreateProduct} 
+                    CreateProductImage={this.CreateProductImage}
                     BuyProduct={this.BuyProduct} 
                     products={this.state.products}
                     account={this.state.account}

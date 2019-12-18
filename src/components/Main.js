@@ -1,18 +1,62 @@
 import React, { Component } from 'react';
-
+const ipfsClient = require('ipfs-http-client')
+const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
 class Main extends Component {
+  constructor(props){
+    super(props)
 
+    this.state={
+      buffer: null,
+      hash: null
+    };
+  }
+
+
+  captureFile = (event) => {
+    event.preventDefault()
+    const file = event.target.files[0]
+    const reader = new window.FileReader()
+    reader.readAsArrayBuffer(file)
+    reader.onloadend = () => {
+      this.setState({ buffer: Buffer(reader.result) })
+      //console.log('buffer', this.state.buffer)
+    }
+  }
+
+
+  Submit = (event) =>{
+    event.preventDefault()
+    ipfs.add(this.state.buffer, (error, result) => {
+      if(error) {
+        console.error(error)
+        return
+      }
+         this.setState({ hash: result[0].hash })
+         console.log(this.state.hash)
+    })
+
+  }
+  
+  AddToDatabase = (event) => {
+    event.preventDefault()
+      const name = this.productName.value
+      const description = this.productDescription.value
+      const price = window.web3.utils.toWei(this.productPrice.value.toString(), 'Ether')
+      if(this.state.buffer){
+        console.log(this.state.hash)        
+        this.props.CreateProductImage(name, description,this.state.hash, price)
+      }else{this.props.CreateProduct(name, description, price)}
+  }
+    
+    //, this.AddToDatabase
   render() {
     return (
       <div id="content">
         <h1>Add Product</h1>
-        <form onSubmit={(event) => {
-          event.preventDefault()
-          const name = this.productName.value
-          const description = this.productDescription.value
-          const price = window.web3.utils.toWei(this.productPrice.value.toString(), 'Ether')
-          this.props.CreateProduct(name, description, price)
-        }}>
+        <form onSubmit={this.AddToDatabase}>
           <div className="form-group mr-sm-2">
             <input
               id="productName"
@@ -40,6 +84,10 @@ class Main extends Component {
               placeholder="Product Price"
               required />
           </div>
+          <div>
+                  <input type='file' onChange={this.captureFile} />
+                  <input type='button' value="Confirm"  onClick={this.Submit}/>
+                </div>
           <button type="submit" className="btn btn-primary">Add Product</button>
         </form>
         <p>&nbsp;</p>
@@ -65,6 +113,9 @@ class Main extends Component {
                   <td>{product.description}</td>
                   <td>{window.web3.utils.fromWei(product.price.toString(), 'Ether')} Eth</td>
                   <td>{product.owner}</td>
+                  <td>{product.imageSource !== "" 
+                  ?<img src={`https://ipfs.infura.io/ipfs/${product.imageSource}`}/>
+                  :'No photo'}</td>
                   <td>
                     { !product.purchased && product.owner != this.props.account
                       ? <button

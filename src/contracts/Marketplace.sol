@@ -10,6 +10,7 @@ contract Marketplace{
         string name;
         string description;
         uint price;
+        string imageSource;
         address payable owner; //whomst owns the product, changable
         bool purchased;
     }
@@ -23,8 +24,16 @@ contract Marketplace{
         require(bytes(Name).length > 0,'Invalid name');
         require(Price > 0,'Invalid price');
         productCounter++;
-        products[productCounter] = Product(productCounter,Name,Description,Price,msg.sender,false);
+        products[productCounter] = Product(productCounter,Name,Description,Price,"",msg.sender,false);
         emit CreatedProduct(productCounter,Name,Description,Price,msg.sender,false);
+    }
+    //with picture
+    function CreateProductImage(string memory Name,string memory Description,string memory image, uint Price) public{
+        require(bytes(Name).length > 0,'Invalid name');
+        require(Price > 0,'Invalid price');
+        productCounter++;
+        products[productCounter] = Product(productCounter,Name,Description,Price,image,msg.sender,false);
+        emit CreatedProductImage(productCounter,Name,Description,image,Price,msg.sender,false);
     }
 
     function BuyProduct(uint Id) public payable{
@@ -42,13 +51,21 @@ contract Marketplace{
         address(seller).transfer(msg.value);
         emit ProductBought(productCounter,product.name,product.price,msg.sender,true);
     }
-
-
     //events
     event CreatedProduct(
         uint id,
         string name,
         string description,
+        uint price,
+        address payable owner,
+        bool purchased
+    );
+
+    event CreatedProductImage(
+        uint id,
+        string name,
+        string description,
+        string imageSource,
         uint price,
         address payable owner,
         bool purchased
