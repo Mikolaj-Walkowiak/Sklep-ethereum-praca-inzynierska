@@ -5,6 +5,11 @@ contract Marketplace{
     uint public productCounter = 0;
     mapping (uint =>Product) public products; // conects ids with whole struct
 
+    struct Sold{
+        string adr;
+        address orgOwner;
+        uint id;
+    }
     struct Product{
         uint id;
         string name;
