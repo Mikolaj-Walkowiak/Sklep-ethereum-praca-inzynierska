@@ -4,25 +4,32 @@ import { Route, Link, Switch, BrowserRouter as Router } from 'react-router-dom'
 import './App.css';
 import Marketplace from '../abis/Marketplace.json'
 import Navbar from './Navbar'
-import Main from './Main'
+
 import AddProduct from './AddProduct'
 import BuyProduct from './BuyProduct'
-import ProductDescription from './ProductDescription';
+import ProductDescription from './ProductDescription'
+import ShipmentDetails from './ShipmentDetails'
+import Bought from './Bought'
+import Sold from './Sold'
+
 class App extends Component {
 
   CreateProduct(name, description, price) {
     this.setState({ loading: true })
     this.state.marketplace.methods.CreateProduct(name, description, price)
       .send({ from: this.state.account }).once('receipt', (receipt) => {
-        this.setState({ loading: false })
+        this.setState({ loading: false },
+          window.location.reload())
       })
   }
+
 
   CreateProductImage(name, description, hash, price) {
     this.setState({ loading: true })
     this.state.marketplace.methods.CreateProductImage(name, description, hash, price)
       .send({ from: this.state.account }).once('receipt', (receipt) => {
-        this.setState({ loading: false })
+        this.setState({ loading: false },
+          window.location.reload())
       })
   }
 
@@ -57,13 +64,20 @@ class App extends Component {
       //console.log(market)
       this.setState({ marketplace })//same as marketplace: marketplace
       const productCount = await marketplace.methods.productCounter().call()
+      //console.log('prod count', productCount)
       this.setState({ productCount })
       for (var i = 1; i <= productCount; ++i) {
         const product = await marketplace.methods.products(i).call()
-        product.price = window.web3.utils.fromWei(product.price.toString(), 'Ether')        this.setState({ products: [...this.state.products, product] })
+        //console.log('product', product)
+        product.price = window.web3.utils.fromWei(product.price.toString(), 'Ether')   
+        product.id = product.id.toString()*1     
+        //console.log(product.id)
+        this.setState({ products: [...this.state.products, product] })
       }
       //console.log(productCount.toString())
       this.setState({ loading: false })
+      
+      //console.log(this.state.products)
     } else { window.alert('Marketplace not deployed to network') }//in case user is connected to wrong network
 
   }
@@ -83,11 +97,12 @@ class App extends Component {
 
 
 
-  BuyProduct(id, price) {
+  BuyProduct(id, price,address) {
     this.setState({ loading: true })
-    this.state.marketplace.methods.BuyProduct(id)
+    this.state.marketplace.methods.BuyProduct(id, address)
       .send({ from: this.state.account, value: price }).once('receipt', (receipt) => {
-        this.setState({ loading: false })
+        this.setState({ loading: false },
+          window.location.reload())
       })
   }
 
@@ -108,11 +123,22 @@ class App extends Component {
                     CreateProductImage={this.CreateProductImage}
                   />} />
                   <Route path="/ProductDescription" render={(props) => <ProductDescription {...props}
+                   account={this.state.account}
+                  />}/>
+                   <Route path="/ShipmentDetails" render={(props) => <ShipmentDetails {...props}
                    BuyProduct={this.BuyProduct}
                    account={this.state.account}
                   />}/>
+                  <Route path="/Bought" render={props => <Bought  {...props}
+                    marketplace={this.state.marketplace.methods}
+                    account={this.state.account}
+                    
+                  />} />
+                  <Route path="/Sold" render={props => <Sold
+                    marketplace={this.state.marketplace.methods}
+                    account={this.state.account}
+                  />} />
                     <Route path="/" render={props => <BuyProduct
-                      
                       products={this.state.products}
                       account={this.state.account}
 
