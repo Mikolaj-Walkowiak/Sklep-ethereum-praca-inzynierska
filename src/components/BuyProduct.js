@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Route, Link, Switch, BrowserRouter as Router } from 'react-router-dom'
+import Dropdown from 'react-dropdown'
 class BuyProduct extends Component {
     itemStatus(product) {
         return !product.purchased && product.owner != this.props.account
@@ -13,6 +14,7 @@ class BuyProduct extends Component {
         return (
             <div className="col-lg-12">
                 <h2>Buy Product</h2>
+               
                 <div className="row">
                 {this.props.products.map((product, key) => {
                     return (

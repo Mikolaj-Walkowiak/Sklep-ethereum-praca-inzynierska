@@ -3,6 +3,30 @@ import { Redirect, Link } from 'react-router-dom'
 import ShipmentDetails from './ShipmentDetails'
 
 class ProductDescription extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+          sold: false,
+          satisfaction:  ''
+        }
+      }
+
+
+
+    async componentWillMount() {
+        await this.loadstats()
+      }
+      async loadstats() {
+        var product = this.props.location.state.product
+        var seller = product.owner
+        var stats = await this.props.marketplace.okboomer(seller).call()
+        var sold = stats.sold
+        var satisfaction = stats.okboomer
+        this.setState({ sold: product.purchased })
+        this.setState({ satisfaction: satisfaction +'/'+ sold})
+          }
+
+
     render() {
         if (this.props.location.state.product == null) {
             return <Redirect to='/' />
@@ -20,16 +44,20 @@ class ProductDescription extends Component {
                                 <p className="h4">{product.name}</p>
                                 <div className="row">
                                     {product.imageSource !== ""
-                                        ? <img src={`https://ipfs.infura.io/ipfs/${product.imageSource}`} style={{ width: '30%' }} />
+                                        ? <img src={`https://ipfs.infura.io/ipfs/${product.imageSource}`} style={{ width: '30%', height: '30%'}} />
                                         : 'No photo'}
                                     <div className="p-2 col-sm-6">
                                         {product.description}
                                     </div>
                                 </div>
                                 <p className="h6 text-md-right">Cena: {product.price} Eth</p>
+                                <div className="col-md-2" style={{ float: 'left' }}>{product.purchased?
+                                'Sold': <span>Seller score: {this.state.satisfaction}*<br/> *satisfied / total</span>}
+                                </div>
                                 <div className="col-md-2" style={{ float: 'right' }}>
                                     <Link style={{ textDecoration: 'none', color: 'black' }} to={{ pathname: "/ShipmentDetails", state: { product: product } }} >
                                         <button className="btn btn-success p-2" style={{ float: 'right', margin: '5px' }}
+                                        disabled = {product.purchased? "disabled" : ""}
                                         >Buy</button>
                                     </Link>
                                 </div>

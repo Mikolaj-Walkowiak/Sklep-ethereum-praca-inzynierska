@@ -1,4 +1,5 @@
 import React from 'react'
+import NumericInput from 'react-numeric-input'
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
 
@@ -9,10 +10,13 @@ class AddProduct extends React.Component {
   
     this.state={
       buffer: null,
-      hash: null
+      hash: null,
+      disabled: false
     };
   }
-
+  handleClick() {
+    this.setState( {disabled: !this.state.disabled} )
+  } 
 
 
   captureFile = (event) => {
@@ -36,6 +40,8 @@ class AddProduct extends React.Component {
       }
       this.setState({ hash: result[0].hash })
       console.log(this.state.hash)
+      this.handleClick()
+      
     })
   
   }
@@ -51,8 +57,6 @@ class AddProduct extends React.Component {
     } else { this.props.CreateProduct(name, description, price) }
   }
   
-
-
 
   render() {
     return (
@@ -75,22 +79,25 @@ class AddProduct extends React.Component {
               ref={(input) => { this.productDescription = input }}
               className="form-control"
               placeholder="Product Description"
-              required />
+               />
           </div>
           <div className="form-group mr-sm-2">
-            <input
+            <NumericInput 
               id="productPrice"
-              type="text"
               ref={(input) => { this.productPrice = input }}
               className="form-control"
               placeholder="Product Price"
-              required />
+              required
+              style={false} />
           </div>
           <div>
-            <input type='file' onChange={this.captureFile} />
+            <input type='file' onChange={e => { this.handleClick(); this.captureFile(e) }} /> 
             <input type='button' value="Confirm" onClick={this.Submit} />
           </div>
-          <button type="submit" className="btn btn-primary">Add Product</button>
+          <button type="submit"
+           className="btn btn-primary"
+           disabled = {(this.state.disabled)? "disabled" : ""}
+           >Add Product</button>
         </form>
       </div>
     )

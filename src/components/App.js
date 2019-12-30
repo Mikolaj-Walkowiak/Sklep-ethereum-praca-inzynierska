@@ -4,7 +4,8 @@ import { Route, Link, Switch, BrowserRouter as Router } from 'react-router-dom'
 import './App.css';
 import Marketplace from '../abis/Marketplace.json'
 import Navbar from './Navbar'
-
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Button from 'react-bootstrap/Button';
 import AddProduct from './AddProduct'
 import BuyProduct from './BuyProduct'
 import ProductDescription from './ProductDescription'
@@ -124,6 +125,7 @@ class App extends Component {
                   />} />
                   <Route path="/ProductDescription" render={(props) => <ProductDescription {...props}
                    account={this.state.account}
+                   marketplace={this.state.marketplace.methods}
                   />}/>
                    <Route path="/ShipmentDetails" render={(props) => <ShipmentDetails {...props}
                    BuyProduct={this.BuyProduct}
