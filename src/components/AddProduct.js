@@ -82,13 +82,13 @@ class AddProduct extends React.Component {
                />
           </div>
           <div className="form-group mr-sm-2">
-            <NumericInput 
+            <input 
               id="productPrice"
-              ref={(input) => { this.productPrice = input }}
-              className="form-control"
+              ref={(input) => {this.productPrice = input }}
+              className="form-control"  
               placeholder="Product Price"
               required
-              style={false} />
+              type="number" />
           </div>
           <div>
             <input type='file' onChange={e => { this.handleClick(); this.captureFile(e) }} /> 

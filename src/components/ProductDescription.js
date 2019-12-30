@@ -52,12 +52,16 @@ class ProductDescription extends Component {
                                 </div>
                                 <p className="h6 text-md-right">Cena: {product.price} Eth</p>
                                 <div className="col-md-2" style={{ float: 'left' }}>{product.purchased?
-                                'Sold': <span>Seller score: {this.state.satisfaction}*<br/> *satisfied / total</span>}
+                                'Sold': 
+                                product.owner === this.props.account? "You're the seller":
+                                <span>Seller score: {this.state.satisfaction}*<br/> *satisfied / total</span>}
                                 </div>
                                 <div className="col-md-2" style={{ float: 'right' }}>
                                     <Link style={{ textDecoration: 'none', color: 'black' }} to={{ pathname: "/ShipmentDetails", state: { product: product } }} >
                                         <button className="btn btn-success p-2" style={{ float: 'right', margin: '5px' }}
-                                        disabled = {product.purchased? "disabled" : ""}
+                                        disabled = {product.purchased? "disabled" :
+                                        product.owner === this.props.account? "disabled"
+                                        : ""}
                                         >Buy</button>
                                     </Link>
                                 </div>
