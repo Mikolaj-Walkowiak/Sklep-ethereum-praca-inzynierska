@@ -88,7 +88,7 @@ class AddProduct extends React.Component {
               className="form-control"  
               placeholder="Product Price"
               required
-              type="number" />
+              input type="text" pattern="[0-9]+([\.,][0-9]+)?" />
           </div>
           <div>
             <input type='file' onChange={e => { this.handleClick(); this.captureFile(e) }} /> 
