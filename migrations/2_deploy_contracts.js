@@ -1,5 +1,5 @@
-const Marketplace = artifacts.require("Marketplace");
+const Shop = artifacts.require("Shop");
 
 module.exports = function(deployer) {
-  deployer.deploy(Marketplace);
+  deployer.deploy(Shop);
 };

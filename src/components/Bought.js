@@ -14,21 +14,21 @@ class Bought extends Component {
   }
   async lowerScore(adr, ind){
     console.log(this.props.account)
-    await this.props.marketplace.BadBoomer(adr,ind).send({from:this.props.account})
+    await this.props.shop.Badmerchant(adr,ind).send({from:this.props.account})
   }
   async loadbought() {
     var tmp = this.props.account
     console.log('address', tmp)
-    const len = await this.props.marketplace.getBoughtLen(tmp).call()
+    const len = await this.props.shop.getBoughtLen(tmp).call()
     console.log('len', len)
     if (len > 0) {
       this.setState({ didBuy: true })
       for (var i = 0; i < len; ++i) {
-        const bought = await this.props.marketplace.bought(tmp, i).call()
-        bought["name"]= (await this.props.marketplace.products(bought.id).call()).name
-        bought["price"] =  window.web3.utils.fromWei((await this.props.marketplace.products(bought.id).call()).price.toString(), 'Ether') + "Eth"
+        const bought = await this.props.shop.bought(tmp, i).call()
+        bought["name"]= (await this.props.shop.products(bought.id).call()).name
+        bought["price"] =  window.web3.utils.fromWei((await this.props.shop.products(bought.id).call()).price.toString(), 'Ether') + "Eth"
         console.log('bought', bought)
-        var score = await this.props.marketplace.okboomer(bought.orgOwner).call()
+        var score = await this.props.shop.okmerchant(bought.orgOwner).call()
         console.log("score",score)
         this.setState({ bought: [...this.state.bought, bought] })
         

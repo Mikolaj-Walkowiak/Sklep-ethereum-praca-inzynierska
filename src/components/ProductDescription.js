@@ -19,9 +19,9 @@ class ProductDescription extends Component {
       async loadstats() {
         var product = this.props.location.state.product
         var seller = product.owner
-        var stats = await this.props.marketplace.okboomer(seller).call()
+        var stats = await this.props.shop.okmerchant(seller).call()
         var sold = stats.sold
-        var satisfaction = stats.okboomer
+        var satisfaction = stats.okmerchant
         this.setState({ sold: product.purchased })
         this.setState({ satisfaction: satisfaction +'/'+ sold})
           }

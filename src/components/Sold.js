@@ -16,14 +16,14 @@ class Sold extends Component {
   async loadsold() {
     var tmp = this.props.account
     console.log('address', tmp)
-    const len = await this.props.marketplace.getSoldLen(tmp).call()
+    const len = await this.props.shop.getSoldLen(tmp).call()
     console.log('len', len)
     if (len > 0) {
       this.setState({ didSell: true })
       for (var i = 0; i < len; ++i) {
-        const sold = await this.props.marketplace.sold(tmp, i).call()
-        sold["name"]= (await this.props.marketplace.products(sold.id).call()).name
-        sold["price"] =  window.web3.utils.fromWei((await this.props.marketplace.products(sold.id).call()).price.toString(), 'Ether') + "Eth"
+        const sold = await this.props.shop.sold(tmp, i).call()
+        sold["name"]= (await this.props.shop.products(sold.id).call()).name
+        sold["price"] =  window.web3.utils.fromWei((await this.props.shop.products(sold.id).call()).price.toString(), 'Ether') + "Eth"
         console.log('sold', sold)
         this.setState({ sold: [...this.state.sold, sold] })
         

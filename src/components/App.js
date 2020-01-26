@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import { Route, Link, Switch, BrowserRouter as Router } from 'react-router-dom'
 import './App.css';
-import Marketplace from '../abis/Marketplace.json'
+import Shop from '../abis/Shop.json'
 import Navbar from './Navbar'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
@@ -16,30 +16,27 @@ import Sold from './Sold'
 class App extends Component {
 
   CreateProduct(name, description, price) {
-    this.setState({ loading: true })
-    this.state.marketplace.methods.CreateProduct(name, description, price)
-      .send({ from: this.state.account }).once('receipt', (receipt) => {
-        this.setState({ loading: false },
-          window.location.reload())
-      })
+    this.state.shop.methods.CreateProduct(name, description, price)
+      .send({ from: this.state.account })
+      this.setState({ loading: false })
+      window.location.reload()
   }
 
 
   CreateProductImage(name, description, hash, price) {
     this.setState({ loading: true })
-    this.state.marketplace.methods.CreateProductImage(name, description, hash, price)
-      .send({ from: this.state.account }).once('receipt', (receipt) => {
-        this.setState({ loading: false },
-          window.location.reload())
-      })
+    this.state.shop.methods.CreateProductImage(name, description, hash, price)
+      .send({ from: this.state.account })
+      this.setState({ loading: false })
+      window.location.reload()
   }
 
   async componentWillMount() {
     await this.loadWeb3()
-    await this.loadBlockchainData()
+    await this.loadData()
   }
 
-  async loadWeb3() {//from https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
+  async loadWeb3() {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum)
       await window.ethereum.enable()
@@ -52,34 +49,31 @@ class App extends Component {
     }
   }
 
-  async loadBlockchainData() {
+  async loadData() {
     const web3 = window.web3
-    // Load account
     const accounts = await web3.eth.getAccounts()
-    //console.log(accounts)
-    this.setState({ account: accounts[0] })//react component state
-    //console.log(Marketplace.abi, Marketplace.networks[5777].address)
+    this.setState({ account: accounts[0] })
     const networkId = await web3.eth.net.getId()
-    if (Marketplace.networks[networkId]) {
-      const marketplace = web3.eth.Contract(Marketplace.abi, Marketplace.networks[networkId].address)
+    if (Shop.networks[networkId]) {
+      const shop = web3.eth.Contract(Shop.abi, Shop.networks[networkId].address)
       //console.log(market)
-      this.setState({ marketplace })//same as marketplace: marketplace
-      const productCount = await marketplace.methods.productCounter().call()
-      //console.log('prod count', productCount)
-      this.setState({ productCount })
-      for (var i = 1; i <= productCount; ++i) {
-        const product = await marketplace.methods.products(i).call()
+      this.setState({ shop })//same as shop: shop
+      const productTotal = await shop.methods.productTotal().call()
+      //console.log('prod count', productTotal)
+      this.setState({ productTotal })
+      for (var i = 1; i <= productTotal; ++i) {
+        const product = await shop.methods.products(i).call()
         //console.log('product', product)
         product.price = window.web3.utils.fromWei(product.price.toString(), 'Ether')   
         product.id = product.id.toString()*1     
         //console.log(product.id)
         this.setState({ products: [...this.state.products, product] })
       }
-      //console.log(productCount.toString())
+      //console.log(productTotal.toString())
       this.setState({ loading: false })
       
       //console.log(this.state.products)
-    } else { window.alert('Marketplace not deployed to network') }//in case user is connected to wrong network
+    } else { window.alert('Shop not deployed to network') }//in case user is connected to wrong network
 
   }
 
@@ -87,7 +81,7 @@ class App extends Component {
     super(props)
     this.state = {
       account: '',
-      productCount: 0,
+      productTotal: 0,
       products: [],
       loading: true
     }
@@ -99,12 +93,10 @@ class App extends Component {
 
 
   BuyProduct(id, price,address) {
-    this.setState({ loading: true })
-    this.state.marketplace.methods.BuyProduct(id, address)
-      .send({ from: this.state.account, value: price }).once('receipt', (receipt) => {
-        this.setState({ loading: false },
-          window.location.reload())
-      })
+    this.state.shop.methods.BuyProduct(id, address)
+      .send({ from: this.state.account, value: price })
+      this.setState({ loading: false })
+      window.location.reload()
   }
 
   render() {
@@ -125,19 +117,19 @@ class App extends Component {
                   />} />
                   <Route path="/ProductDescription" render={(props) => <ProductDescription {...props}
                    account={this.state.account}
-                   marketplace={this.state.marketplace.methods}
+                   shop={this.state.shop.methods}
                   />}/>
                    <Route path="/ShipmentDetails" render={(props) => <ShipmentDetails {...props}
                    BuyProduct={this.BuyProduct}
                    account={this.state.account}
                   />}/>
                   <Route path="/Bought" render={props => <Bought  {...props}
-                    marketplace={this.state.marketplace.methods}
+                    shop={this.state.shop.methods}
                     account={this.state.account}
                     
                   />} />
                   <Route path="/Sold" render={props => <Sold
-                    marketplace={this.state.marketplace.methods}
+                    shop={this.state.shop.methods}
                     account={this.state.account}
                   />} />
                     <Route path="/" render={props => <BuyProduct
